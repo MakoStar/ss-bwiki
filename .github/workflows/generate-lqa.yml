@@ -32,7 +32,7 @@ jobs:
       - name: Restore ss-data cache
         uses: actions/cache/restore@v6
         with:
-          path: "${{ env.SCRIPT_DIR }}/${{ env.CACHE_DATA_REPO_DIR }}"
+          path: "${{ env.CACHE_DATA_REPO_DIR }}"
           key: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}default"
           restore-keys: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}"
 
@@ -51,6 +51,8 @@ jobs:
         
       - name: Run generate lqa script
         working-directory: scripts/node/generate-lqa
+        env:
+          SS_DATA_DIR: "${{ github.workspace }}/${{ env.CACHE_DATA_REPO_DIR }}"
         run: |
           pnpm install
           node index.js
