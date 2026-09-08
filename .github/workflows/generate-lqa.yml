@@ -1,0 +1,86 @@
+name: Generate lqa json
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CACHE_DATA_REPO_DIR: ss-data
+  RESTORE_DATA_REPO_KEY_PREFIX: ss-data-repo-
+
+jobs:
+  generate-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Restore ss-data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: "${{ env.CACHE_DATA_REPO_DIR }}"
+          key: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}default"
+          restore-keys: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}"
+
+      - name: Check if data exists
+        id: check_data
+        run: |
+          TARGET_REPO="${{ env.CACHE_DATA_REPO_DIR }}"
+          if [ -d "$TARGET_REPO" ] && [ -n "$(ls -A "$TARGET_REPO" 2>/dev/null)" ]; then
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+            echo "Data directory has content"
+          else
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+            echo "Data directory is empty or missing, skipping cache save"
+          fi
+        shell: bash
+
+      - name: Run generate lqa script
+        if: steps.check_data.outputs.valid == 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: "${{ env.CACHE_DATA_REPO_DIR }}"
+          key: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}${{ hashFiles(env.CACHE_DATA_REPO_DIR) }}"
+
+      - name: Run generate lqa script
+        working-directory: scripts/node/generate-lqa
+        run: |
+          pnpm install
+          node index.js
+        shell: bash
+
+      - name: Commit lqa data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+  
+          SOURCE_DIR="scripts/node/generate-lqa/generated_data"
+          TARGET_DIR="generated_data"
+
+          mkdir -p "$TARGET_DIR"
+      
+          if [ -d "$SOURCE_DIR" ]; then
+            rsync -a "$SOURCE_DIR"/ "$TARGET_DIR"/
+          else
+            echo "Script output directory not found!"
+            exit 1
+          fi
+      
+          git add "$TARGET_DIR"/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update lqa generated data"
+            git push
+          fi
+        shell: bash
+        
