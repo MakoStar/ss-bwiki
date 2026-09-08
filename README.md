@@ -3,7 +3,7 @@
 
 ## 特别致谢 / Acknowledgments
 
-- **[AutumnVN](https://github.com/AutumnVN/ss-data)** — 角色ID生成脚本, 感谢 [@AutumnVN](https://github.com/AutumnVN)
+- **[characterid.js](https://github.com/AutumnVN/ss-data/blob/main/characterid.js)** — 角色ID生成脚本, 感谢 [@AutumnVN](https://github.com/AutumnVN)
 - **[StellaSoraBot](https://github.com/lihaohong6/StellaSoraBot)** — 参考代码, 感谢 [@lihaohong6](https://github.com/lihaohong6)
 - 感谢 [星塔旅人bwiki交流群](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=imEfhm9I2-ejje0RH9ZAtrxsmwHWe2vN&authKey=UPrhsD2Av06jjIP7821B58GbNWL4dpmg57nduxsldTbrouHsY92nDLDv22kfAunS&noverify=0&group_code=831668234)的大佬们
 - 感谢 @牢大 提供的数据提取脚本 `角色json获取2.0.py` `秘纹json获取.py`
