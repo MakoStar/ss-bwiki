@@ -153,9 +153,8 @@ async function getTableDefine(tableDefineUrl) {
 
 
 (async () => { 
-  const repoDir = "./ss-data";
   const outputDor = "./generated_data";
-  
+  const repoDir = process.env.SS_DATA_DIR || path.resolve(__dirname, '../../../ss-data');
   // await cloneRepo(SS_DATA_REPO, repoDir);
 
   const jsonDataMapping = await buildDataFileMap(repoDir, {
