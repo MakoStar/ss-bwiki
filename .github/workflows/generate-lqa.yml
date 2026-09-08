@@ -24,6 +24,10 @@ jobs:
         with:
           node-version: 24
 
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
       - name: Restore ss-data cache
         uses: actions/cache/restore@v6
         with:
