@@ -8,6 +8,7 @@ permissions:
 
 env:
   CACHE_DATA_REPO_DIR: ss-data
+  SCRIPT_DIR: scripts/node/generate-lqa
   RESTORE_DATA_REPO_KEY_PREFIX: ss-data-repo-
 
 jobs:
@@ -31,14 +32,14 @@ jobs:
       - name: Restore ss-data cache
         uses: actions/cache/restore@v6
         with:
-          path: "${{ env.CACHE_DATA_REPO_DIR }}"
+          path: "${{ env.SCRIPT_DIR }}/${{ env.CACHE_DATA_REPO_DIR }}"
           key: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}default"
           restore-keys: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}"
 
       - name: Check if data exists
         id: check_data
         run: |
-          TARGET_REPO="${{ env.CACHE_DATA_REPO_DIR }}"
+          TARGET_REPO="${{ env.SCRIPT_DIR }}/${{ env.CACHE_DATA_REPO_DIR }}"
           if [ -d "$TARGET_REPO" ] && [ -n "$(ls -A "$TARGET_REPO" 2>/dev/null)" ]; then
             echo "valid=true" >> "$GITHUB_OUTPUT"
             echo "Data directory has content"
@@ -47,14 +48,7 @@ jobs:
             echo "Data directory is empty or missing, skipping cache save"
           fi
         shell: bash
-
-      - name: Run generate lqa script
-        if: steps.check_data.outputs.valid == 'true'
-        uses: actions/cache/save@v6
-        with:
-          path: "${{ env.CACHE_DATA_REPO_DIR }}"
-          key: "${{ env.RESTORE_DATA_REPO_KEY_PREFIX }}${{ hashFiles(env.CACHE_DATA_REPO_DIR) }}"
-
+        
       - name: Run generate lqa script
         working-directory: scripts/node/generate-lqa
         run: |
