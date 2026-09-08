@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "lua-in-js": "^2.2.5"
+  }
+}
